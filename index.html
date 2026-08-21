@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Магазин</title>
+    <title>Telegram Магазин с фото</title>
     <!-- Официальная библиотека Telegram Web App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -22,7 +22,7 @@
             color: var(--text-color);
             margin: 0;
             padding: 16px;
-            padding-bottom: 90px; /* Отступ снизу для панели корзины */
+            padding-bottom: 90px;
             box-sizing: border-box;
         }
 
@@ -41,22 +41,31 @@
         .product-card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
 
+        .product-image {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background-color: #e0e0e0;
+        }
+
         .product-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .product-price {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--hint-color);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .btn-add {
@@ -65,7 +74,7 @@
             border: none;
             border-radius: 8px;
             padding: 8px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             width: 100%;
@@ -75,7 +84,6 @@
             opacity: 0.8;
         }
 
-        /* Корзина снизу */
         .cart-bar {
             position: fixed;
             bottom: 0;
@@ -100,38 +108,55 @@
 
     <h1>🛍️ Наш Магазин</h1>
 
-    <div class="products-grid" id="product-list">
-        <!-- Товары будут добавляться через JavaScript -->
-    </div>
+    <div class="products-grid" id="product-list"></div>
 
     <div class="cart-bar">
         <div class="cart-info" id="cart-info">Корзина пуста</div>
     </div>
 
     <script>
-        // Инициализация WebApp
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
 
-        // Список товаров
+        // Список товаров с полем image (сюда можно вставить ссылку на картинку)
         const products = [
-            { id: 1, title: 'Футболка Oversize', price: 1500 },
-            { id: 2, title: 'Худи с принтом', price: 3200 },
-            { id: 3, title: 'Кепка Классическая', price: 900 },
-            { id: 4, title: 'Рюкзак городской', price: 2500 }
+            { 
+                id: 1, 
+                title: 'Футболка Oversize', 
+                price: 1500, 
+                image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300&auto=format&fit=crop&q=60' 
+            },
+            { 
+                id: 2, 
+                title: 'Худи с принтом', 
+                price: 3200, 
+                image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=300&auto=format&fit=crop&q=60' 
+            },
+            { 
+                id: 3, 
+                title: 'Кепка Классическая', 
+                price: 900, 
+                image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&auto=format&fit=crop&q=60' 
+            },
+            { 
+                id: 4, 
+                title: 'Рюкзак городской', 
+                price: 2500, 
+                image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300&auto=format&fit=crop&q=60' 
+            }
         ];
 
-        let cart = {}; // Хранилище для выбранных товаров: { id: количество }
+        let cart = {};
 
         const productListEl = document.getElementById('product-list');
         const cartInfoEl = document.getElementById('cart-info');
         const mainButton = window.Telegram.WebApp.MainButton;
 
-        // Отрисовка товаров на странице
         function renderProducts() {
             productListEl.innerHTML = products.map(product => `
                 <div class="product-card">
                     <div>
+                        <img src="${product.image}" alt="${product.title}" class="product-image">
                         <div class="product-title">${product.title}</div>
                         <div class="product-price">${product.price} ₽</div>
                     </div>
@@ -140,24 +165,20 @@
             `).join('');
         }
 
-        // Добавление товара в корзину
         function addToCart(productId) {
             cart[productId] = (cart[productId] || 0) + 1;
             updateCart();
         }
 
-        // Обновление интерфейса корзины и главной кнопки Telegram
         function updateCart() {
             let totalCount = 0;
             let totalPrice = 0;
-            let orderDetails = [];
 
             for (let id in cart) {
                 const product = products.find(p => p.id == id);
                 const count = cart[id];
                 totalCount += count;
                 totalPrice += product.price * count;
-                orderDetails.push(`${product.title} (${count} шт.)`);
             }
 
             if (totalCount > 0) {
@@ -170,7 +191,6 @@
             }
         }
 
-        // Клик по главной кнопке Telegram внизу экрана
         Telegram.WebApp.onEvent('mainButtonClicked', function() {
             let orderSummary = "🛒 Новый заказ:\n";
             let totalPrice = 0;
@@ -183,11 +203,9 @@
             }
             orderSummary += `\nИтого к оплате: ${totalPrice} ₽`;
 
-            // Отправляем данные боту и закрываем приложение
             window.Telegram.WebApp.sendData(orderSummary);
         });
 
-        // Первый запуск отрисовки
         renderProducts();
     </script>
 </body>
