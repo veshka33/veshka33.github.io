@@ -1,13 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мое Telegram Приложение</title>
+    <!-- Официальная библиотека Telegram Web App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #ffffff);
+            --text-color: var(--tg-theme-text-color, #222222);
+            --hint-color: var(--tg-theme-hint-color, #999999);
+            --button-color: var(--tg-theme-button-color, #2481cc);
+            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .card {
+            background: rgba(128, 128, 128, 0.1);
+            padding: 20px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 320px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: var(--hint-color);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn:active {
+            opacity: 0.8;
+        }
+    </style>
 </head>
 <body>
-    <h1>Привет, это мое приложение!</h1>
+
+    <div class="card">
+        <h1 id="greeting">Привет!</h1>
+        <p>Это ваше первое Telegram Mini App, работающее прямо в репозитории GitHub.</p>
+        <button class="btn" id="mainButton">Нажми на меня</button>
+    </div>
+
     <script>
-        // Инициализация (чтобы приложение знало, что оно в Telegram)
+        // Инициализация WebApp
         window.Telegram.WebApp.ready();
+        
+        // Уведомляем Telegram, что приложение полностью загружено и готово к отображению
+        window.Telegram.WebApp.expand();
+
+        // Персонализация: если приложение открыто через бота, покажем имя пользователя
+        const user = window.Telegram.WebApp.initDataUnsafe?.user;
+        if (user && user.first_name) {
+            document.getElementById('greeting').innerText = `Привет, ${user.first_name}!`;
+        }
+
+        // Обработка клика по кнопке
+        document.getElementById('mainButton').addEventListener('click', function() {
+            window.Telegram.WebApp.showAlert('Поздравляем! Ваше Telegram Mini App отлично работает!');
+        });
     </script>
 </body>
 </html>
